@@ -8,13 +8,11 @@ use crate::stat::*;
 fn main() {
     let network = IpNetworkArg::new();
     println!("{} / {}", network.addr, network.prefix);
-
-    let a : u8 = 10; let b : u8 = 88; let c : u8 = 2; let d : u8 = 3;
-    let n = ip4_to_u32(a, b, c, d);
-    println!("{}.{}.{}.{} = {}", a, b, c, d, n);
-    let i = u32_to_ip4(n).octets();
-    println!("{} = {}.{}.{}.{}", n, i[0], i[1], i[2], i[3]);
-    println!("{}",  cidr_addr_count(24));
+    println!();
+    let addresses = network.to_vec();
+    for v in addresses {
+        println!("{}", v)
+    }
 }
 
 struct IpNetworkArg {
@@ -44,13 +42,26 @@ impl IpNetworkArg {
                 .expect("Некорректный формат ввода IP адреса");
             let prefix = u8::from_str(raw_prefix)
                 .expect("Некорректный формат ввода префикса");
+            if prefix > 32 {
+                panic!("Некорректный формат ввода префикса");
+            }
 
-            IpNetworkArg{
+            return IpNetworkArg{
                 addr,
                 prefix
-            }
+            };
         } else {
             panic!("Некорректный формат ввода")
         }
+    }
+
+    pub fn to_vec(&self) -> Vec<Ipv4Addr> {
+        let mut result = Vec::<Ipv4Addr>::new();
+        for i in 0..cidr_addr_count(self.prefix) {
+            let dig = ip4_to_u32(self.addr) + i;
+            result.push(Ipv4Addr::from(u32_to_ip4(dig)));
+        }
+
+        return result;
     }
 }
