@@ -1,15 +1,21 @@
+mod cidr;
 mod stat;
-mod ip_network_arg;
 
-use crate::ip_network_arg::IpNetworkArg;
-use crate::stat::*;
+use clap::{Parser};
+use crate::cidr::Cidr;
 
 fn main() {
-    let network = IpNetworkArg::new();
-    println!("Start IP:\t{}\nPrefix:\t\t/{} ({}-bit)", network.addr, network.prefix, cidr_addr_count(network.prefix));
-    println!();
-    let addresses = network.to_vec();
-    for v in addresses {
-        println!("{}", v)
+    let res = Cli::parse();
+    println!("{}", res.cidr);
+    for a in res.cidr.to_vec() {
+        println!("{}", a);
     }
 }
+
+#[derive(Parser, Debug)]
+#[clap(author, version, about, long_about = None)]
+pub struct Cli {
+    #[clap(short = 'n', long = "network", name = "network")]
+    cidr: Cidr,
+}
+
