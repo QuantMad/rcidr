@@ -1,18 +1,23 @@
 mod cidr;
 
+use std::fs::File;
+use std::io::Write;
+use std::net::Ipv4Addr;
 use clap::{Parser};
 use crate::cidr::Cidr;
 
 fn main() {
     let res = Cli::parse();
-    println!("{}", res.cidr);
-    for a in res.cidr.to_vec() {
-        println!("{}", a);
-    }
-
     match res.export_to {
-        Some(export_to) => println!("{}", export_to),
-        None => println!("нихуя")
+        Some(export_to) => write_to(&export_to, res.cidr.to_vec()),
+        None => ()
+    }
+}
+
+fn write_to(path:&str, list:Vec<Ipv4Addr>) {
+    let mut file = File::create(path).expect("Упс");
+    for addr in list {
+        let _ = file.write(format!("{}\n", addr.to_string()).as_bytes());
     }
 }
 
