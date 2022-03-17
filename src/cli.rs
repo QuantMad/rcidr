@@ -9,4 +9,10 @@ version = "0.1.0")]
 pub struct Cli {
     #[clap(short, long)]
     pub network: Option<Cidr>,
+
+    #[clap(short, long)]
+    pub export: Option<String>,
+
+    #[clap(short, long)]
+    pub open: Option<String>,
 }

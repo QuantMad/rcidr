@@ -1,14 +1,48 @@
+use std::cmp::Ordering;
 use std::net::Ipv4Addr;
 use clap::Parser;
 use std::str::FromStr;
 use std::fmt::{Display, Formatter};
+use std::iter::{Chain, Cloned, Copied, Cycle, Enumerate, Filter, FilterMap, FlatMap, Flatten, Fuse, Inspect, Map, MapWhile, Peekable, Product, Rev, Scan, Skip, SkipWhile, StepBy, Sum, Take, TakeWhile, Zip};
 
 const MAX_PREFIX: u8 = 32_u8;
 
 #[derive(Parser, Debug)]
 pub struct Cidr {
     pub base: Ipv4Addr,
+    iter_base: Ipv4Addr,
     pub prefix: u8,
+}
+
+impl Clone for Cidr {
+    fn clone(&self) -> Self {
+        Cidr {
+            base: self.base.clone(),
+            prefix: self.prefix.clone(),
+            iter_base: self.base.clone()
+        }
+    }
+}
+
+impl Iterator for Cidr {
+    type Item = Ipv4Addr;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if u32::from(self.iter_base) == (u32::from(self.base) + addr_count(self.prefix) - 1) {
+            self.iter_base = self.base.clone();
+            return None;
+        }
+            self.iter_base = Ipv4Addr::from(u32::from(self.iter_base) + 1);
+            Some(self.iter_base)
+    }
+
+    fn count(self) -> usize where Self: Sized {
+        addr_count(self.prefix) as usize
+    }
+
+    fn last(self) -> Option<Self::Item> where Self: Sized {
+        Option::from(Ipv4Addr::from(u32::from(self.base) + addr_count(self.prefix)))
+    }
 }
 
 impl FromStr for Cidr {
@@ -35,7 +69,7 @@ impl FromStr for Cidr {
             panic!("Префикс \"{prefix}\" больше максимально возможного: \"{MAX_PREFIX}\"")
         }
 
-        Ok(Cidr{base, prefix})
+        Ok(Cidr{base, prefix, iter_base:base.clone()})
     }
 }
 
