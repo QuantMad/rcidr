@@ -11,8 +11,11 @@ pub struct Cli {
     pub network: Option<Cidr>,
 
     #[clap(short, long)]
+    pub open: Option<String>,
+
+    #[clap(short, long)]
     pub export: Option<String>,
 
     #[clap(short, long)]
-    pub open: Option<String>,
+    pub append: Option<bool>,
 }

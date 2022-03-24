@@ -1,7 +1,9 @@
+use std::cmp::Ordering;
 use std::net::Ipv4Addr;
 use clap::Parser;
 use std::str::FromStr;
 use std::fmt::{Display, Formatter};
+use std::iter::Iterator;
 
 const MAX_PREFIX: u8 = 32_u8;
 
@@ -26,13 +28,12 @@ impl Iterator for Cidr {
     type Item = Ipv4Addr;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if u32::from(self.iter_base) as u64 == (u32::from(self.base) as u64 + addr_count(self.prefix) as u64) {
+        if u32::from(self.iter_base) == (u32::from(self.base) + addr_count(self.prefix) - 1) {
             self.iter_base = self.base.clone();
             return None;
         }
-        let curr = self.iter_base.clone();
-        self.iter_base = Ipv4Addr::from(u32::from(self.iter_base) + 1);
-        Some(curr)
+            self.iter_base = Ipv4Addr::from(u32::from(self.iter_base) + 1);
+            Some(self.iter_base)
     }
 
     fn count(self) -> usize where Self: Sized {
@@ -77,7 +78,7 @@ impl Display for Cidr {
         write!(f, "{}/{}", self.base, self.prefix)
     }
 }
-/*
+
 impl Cidr {
     pub fn to_vec(&self) -> Vec<Ipv4Addr> {
         let mut result = Vec::<Ipv4Addr>::new();
@@ -89,7 +90,7 @@ impl Cidr {
         return result;
     }
 }
-*/
+
 pub fn addr_count(prefix:u8) -> u32 {
     2_u32.pow((MAX_PREFIX - prefix) as u32)
 }
