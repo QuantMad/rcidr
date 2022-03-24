@@ -1,4 +1,3 @@
-use std::cmp::Ordering;
 use std::net::Ipv4Addr;
 use clap::Parser;
 use std::str::FromStr;
