@@ -31,8 +31,8 @@ impl Iterator for Cidr {
             self.iter_base = self.base.clone();
             return None;
         }
-            self.iter_base = Ipv4Addr::from(u32::from(self.iter_base) + 1);
-            Some(self.iter_base)
+        self.iter_base = Ipv4Addr::from(u32::from(self.iter_base) + 1);
+        Some(self.iter_base)
     }
 
     fn count(self) -> usize where Self: Sized {
