@@ -18,4 +18,7 @@ pub struct Cli {
 
     #[clap(short, long)]
     pub append: Option<bool>,
+
+    #[clap(short, long)]
+    pub verbose: Option<bool>,
 }

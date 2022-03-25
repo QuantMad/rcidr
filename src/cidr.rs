@@ -78,7 +78,7 @@ impl Display for Cidr {
     }
 }
 
-impl Cidr {
+/*impl Cidr {
     pub fn to_vec(&self) -> Vec<Ipv4Addr> {
         let mut result = Vec::<Ipv4Addr>::new();
         for i in 0..addr_count(self.prefix) {
@@ -88,7 +88,7 @@ impl Cidr {
 
         return result;
     }
-}
+}*/
 
 pub fn addr_count(prefix:u8) -> u32 {
     2_u32.pow((MAX_PREFIX - prefix) as u32)
