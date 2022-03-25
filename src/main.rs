@@ -14,20 +14,23 @@ mod cidr;
 
 fn export(cli: &Cli, cidr_list: Vec<Cidr>) {
     let path = cli.export.clone().unwrap();
-    let mut file = if fs::metadata(path.clone()).is_ok() && cli.append.is_some() {
-        let mut file = File::open(path)
-            .expect("Ошибка чтения целевого файла");
-        file.write("\n".as_bytes());
-        file
+    let mut file = if fs::metadata(path.clone()).is_ok() &&
+        cli.append.clone() {
+        File::options()
+            .read(true)
+            .write(true)
+            .append(true)
+            .open(path)
+            .expect("Ошибка чтения целевого файла")
     } else {
         File::create(path)
             .expect("Ошибка создания файла")
     };
 
-    for cidr in cidr_list { /// Будут проблемы с заимствованием?
+    for cidr in cidr_list {
         for ip in cidr {
-            file.write(format!("{}\n", ip).as_bytes());
-            if cli.verbose.is_some() {
+            let _ = file.write_all(format!("{}\n", ip).as_bytes());
+            if cli.print.clone() {
                 println!("{}", ip);
             }
         }
@@ -39,14 +42,14 @@ fn main() {
 
     if (cli.network.is_some() && cli.open.is_some()) ||
         (!cli.network.is_some() && !cli.open.is_some()) {
-        panic!("Ну и хуйни же ты нагородил")
+        panic!("Конфликт флагов: -n и -o нельзя использовать одновременно")
     }
 
     let cidr_list = parse_cidr_list(&cli);
 
     if cli.export.is_some() {
         export(&cli, cidr_list);
-    } else if cli.verbose.is_some() {
+    } else if cli.print.clone() {
         for cidr in cidr_list {
             for ip in cidr {
                 println!("{}", ip);
