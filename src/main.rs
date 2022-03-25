@@ -40,8 +40,7 @@ fn export(cli: &Cli, cidr_list: Vec<Cidr>) {
 fn main() {
     let cli = Cli::parse();
 
-    if (cli.network.is_some() && cli.open.is_some()) ||
-        (!cli.network.is_some() && !cli.open.is_some()) {
+    if cli.network.is_some() && cli.open.is_some() {
         panic!("Конфликт флагов: -n и -o нельзя использовать одновременно")
     }
 
